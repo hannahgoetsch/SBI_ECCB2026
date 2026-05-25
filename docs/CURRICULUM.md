@@ -15,9 +15,9 @@
 | 09:15 | Part 1: Population Genetics | 40 min |
 | 09:55 | *Break* | 5 min |
 | 10:00 | Part 2: Simulation-Based Inference | 70 min |
-| 11:10 | *Break* | 15 min |
-| 11:25 | Part 3: Snakemake Workflow | 60 min |
-| 12:25 | Discussions | — |
+| 11:10 | *Break* | 10 min |
+| 11:20 | Part 3: Snakemake Workflow | 70 min |
+| 12:35 | Discussions | — |
 
 ---
 
@@ -28,12 +28,14 @@
 - Introduction to population genetics and why we care about inferring demographic parameters
 - Classical likelihood-based approaches and their limits
 - What is simulation-based inference (SBI)?
-  - Neural Posterior Estimation (NPE) and competing algorithms (e.g.,ABC)
+  - Neural Posterior Estimation (NPE) and competing algorithms (e.g.,Approximate Bayesion Computation)
   - The role of summary statistics as the bridge between data and inference
 - Showcase: how we implemented and evaluated SBI for inferring $N_e$ and recombination rates
-  - Data pipeline: msprime coalescent simulations + summary statistics (SFS, LD)
+  - Data pipeline: msprime coalescent simulations + summary statistics (Site frequency spectrum, Linkage disequilibrium)
   - Training strategy and validation
-  - Key results in our [preprint](https://doi.org/10.64898/2025.12.01.691638)
+  - Key results in our preprint [Neural posterior estimation for population genetics;
+Jiseon Min, Yuxin Ning, Nathaniel S. Pope, Franz Baumdicker, Andrew D. Kern;
+bioRxiv 2025.12.01.691638; doi: https://doi.org/10.64898/2025.12.01.691638](https://doi.org/10.64898/2025.12.01.691638)
 
 ---
 
@@ -52,9 +54,9 @@
 - Inspecting tree sequences and genotype matrices
 
 ### 1.3 Summary statistics: the site-frequency spectrum (SFS) (10 min)
-- Extracting the allele frequency spectrum with `tskit`
+- Extracting the SFS with `tskit`
 - Folded vs. unfolded SFS
-- Visualising and interpreting AFS shape under different $N_e$ values
+- Visualising and interpreting SFS shape under different $N_e$ values
 
 ### 1.4 Q&A / buffer (5 min)
 
@@ -72,16 +74,16 @@
 
 ### 2a. Introduction to SBI (20 min) — `2_introduction_to_sbi.ipynb`
 
-#### Why SBI? (5 min)
+#### 2a.1 Why SBI? (5 min)
 - Intractable likelihoods and the role of simulators
-- NPE, NLE, NRE at a glance — why this workshop focuses on NPE
+- The focus of this workshop: Neural Posterior Estimation
 
-#### The `sbi` toolkit: linear Gaussian example (10 min)
+#### 2a.2 The `sbi` toolkit: linear Gaussian example (10 min)
 - Defining a `Prior` and a `Simulator`
 - Training a neural density estimator with `NPE`
 - Drawing posterior samples and visualising with `pairplot`
 
-#### Posterior predictive checks (PPC) (5 min)
+#### 2a.3 Posterior predictive checks (PPC) (5 min)
 - Comparing simulated data from posterior draws to the observed data
 - Reading a PPC plot: what good and bad coverage look like
 
@@ -89,16 +91,16 @@
 
 ### 2b. SBI in Population Genetics (30 min) — `3_sbi_in_popgen.ipynb`
 
-#### Applying NPE to popgen (10 min)
+#### 2b.1 Applying NPE to popgen (10 min)
 - The full pipeline: msprime simulator → SFS summary statistic → prior → NPE
 - Jointly inferring $N_e$ and the recombination rate
 
-#### Training and evaluation (15 min)
+#### 2b.2 Training and evaluation (15 min)
 - Generating $(\theta, x)$ training pairs
 - Training the density estimator and monitoring convergence
 - Posterior predictive checks on held-out test data
 
-#### Simulation-based calibration (SBC) (5 min) — *optional*
+#### 2b.3 Simulation-based calibration (SBC) (5 min) — *optional*
 - Why calibration matters for scientific credibility
 - Running SBC and interpreting rank histograms
 
@@ -106,40 +108,40 @@
 
 ### 2c. Playground — Complex Demographic Scenarios (20 min) — `4_playground_complex_scenario.ipynb`
 
-#### Multi-epoch demography (8 min)
+#### 2c.1 Multi-epoch demography (8 min)
 - Designing a `BoxUniform` prior over epoch-specific $N_e$ values and recombination rate
 - Building piecewise-constant demography in `msprime`
 
-#### Comparing demographic scenarios (7 min)
+#### 2c.2 Comparing demographic scenarios (7 min)
 - Medium, Large, Decline, Expansion, Bottleneck, Zigzag
-- How AFS shape encodes demographic history — and where it becomes ambiguous
+- How SFS shape encodes demographic history — and where it becomes ambiguous
 
-#### Why your prior matters (5 min)
+#### 2c.3 Why your prior matters (5 min)
 - Coverage, identifiability, and pathological priors
 - Open exploration: participants modify priors and observe effects
 
 ---
 
-## *Break (15 min)*
+## *Break (10 min)*
 
 ---
 
-## Part 3: Snakemake Workflow (60 min)
+## Part 3: Snakemake Workflow (70 min)
 
 **Demo / Walkthrough | Notebook: `5_snakemake_workflow.ipynb` + [`popgen-npe`](https://github.com/kr-colab/popgen-npe) pipeline**
 
-*Goal: see how a research-grade SBI workflow is structured for reproducibility and scaling, and walk through the popgen-npe [Soup-to-Nuts tutorial](https://popgen-npe.readthedocs.io/en/latest/tutorial.html) to infer a recombination rate landscape from a VCF.*
+*Goal: see how a research-grade SBI workflow is structured for reproducibility and scaling, and walk through the popgen-npe [Soup-to-Nuts tutorial](https://popgen-npe.readthedocs.io/en/latest/tutorial.html) to infer a recombination rate landscape from a Variant Call Format (VCF) file.*
 
 ### 3.1 Motivation: from notebook to pipeline (5 min)
 - Why interactive notebooks don't scale: memory, parallelism, reproducibility
-- What Snakemake brings: rule-based DAGs, checkpointing, cluster integration
+- What Snakemake brings: rule-based directed acyclic graph (DAG), checkpointing, cluster integration
 
 ### 3.2 Pipeline architecture (10 min)
 - Repository structure of [`popgen-npe`](https://github.com/kr-colab/popgen-npe): `workflow/training_workflow.smk`, `workflow/prediction_workflow.smk`, `workflow/config/`
 - The simulator → processor → embedding network → normalising flow pipeline
 - One YAML drives both training and prediction (see `popgen_npe_demo/config.yaml`)
 
-### 3.3 Live demo: running the pipeline (30 min)
+### 3.3 Live demo: running the pipeline (40 min)
 - Walk through the Soup-to-Nuts tutorial's six steps inside `5_snakemake_workflow.ipynb`
 - Steps 1–3 (simulator, processor, YAML): read the config that produced the shipped checkpoint
 - Step 4 (training): explain, **do not** re-run live — checkpoint is shipped at `notebooks/popgen_npe_demo/checkpoint/`

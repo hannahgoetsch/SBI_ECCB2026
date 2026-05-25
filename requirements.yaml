@@ -14,3 +14,8 @@ dependencies:
       - tskit
       - jupyter
       - ipykernel
+      # Needed for notebook 5 (popgen-npe Soup-to-Nuts demo).
+      # popgen-npe itself is not on PyPI — clone it as a sibling directory
+      # of this repo (see README.md, "Notebook 5 setup") and install in
+      # editable mode from there.
+      - snakemake
