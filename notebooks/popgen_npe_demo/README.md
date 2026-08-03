@@ -27,28 +27,10 @@ popgen_npe_demo/
 
 ## What's missing right now
 
-The directory is shipped as a skeleton. Before the workshop you need to populate it:
-
-1. **`config.yaml`** — copy from tutorial Step 3.
-2. **`checkpoint/`** — run training once on your own machine or cluster:
-   ```bash
-   snakemake --cores N \
-             --configfile popgen_npe_demo/config.yaml \
-             --snakefile <popgen-npe>/workflow/training_workflow.smk
-   ```
-   Then copy the resulting model artifacts into `checkpoint/`.
-3. **`example_vcf/`** — a small public VCF (e.g. one chromosome arm, a few hundred
-   samples). The sample counts and population labels must match the simulator's
-   `samples` field in `config.yaml`.
-4. **`expected_outputs/rate_landscape.png`** — generate by running Step 5 + Step 6
-   end-to-end once and saving the figure.
-
-## Why ship a checkpoint?
-
-A real training run takes minutes to hours and benefits from a GPU. The workshop
-schedule allocates 20 minutes to Part 3 — only enough to read the config, run
-prediction against pre-trained weights, and interpret the resulting rate
-landscape.
+1. **`config.yaml`**
+2. **`checkpoint/`** 
+3. **`example_vcf/`** 
+4. **`expected_outputs/rate_landscape.png`**
 
 ## Reproducibility
 

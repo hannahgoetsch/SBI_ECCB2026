@@ -13,9 +13,9 @@
 |------|---------|----------|
 | 09:00 | Opening Presentation | 15 min |
 | 09:15 | Part 1: Population Genetics | 40 min |
-| 09:55 | *Break* | 5 min |
-| 10:00 | Part 2: Simulation-Based Inference | 70 min |
-| 11:10 | *Break* | 10 min |
+| 09:55 | Part 2: Simulation-Based Inference | 35 min |
+| 10:30 | *Break* | 15 min |
+| 10:45 | Part 2 continued: Simulation-Based Inference | 35 min |
 | 11:20 | Part 3: Snakemake Workflow | 70 min |
 | 12:35 | Discussions | — |
 
@@ -28,7 +28,7 @@
 - Introduction to population genetics and why we care about inferring demographic parameters
 - Classical likelihood-based approaches and their limits
 - What is simulation-based inference (SBI)?
-  - Neural Posterior Estimation (NPE) and competing algorithms (e.g.,Approximate Bayesion Computation)
+  - Neural Posterior Estimation (NPE) and competing algorithms (e.g., Approximate Bayesian Computation)
   - The role of summary statistics as the bridge between data and inference
 - Showcase: how we implemented and evaluated SBI for inferring $N_e$ and recombination rates
   - Data pipeline: msprime coalescent simulations + summary statistics (Site frequency spectrum, Linkage disequilibrium)

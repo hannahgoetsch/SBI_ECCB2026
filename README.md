@@ -3,7 +3,7 @@
 A 3.5-hour hands-on tutorial on **simulation-based inference (SBI)** in population genetics, presented at [ECCB 2026](https://eccb2026.org).
 
 **Hosts:** Yuxin Ning · Hannah Götsch  
-**Contributors:** Prof. Franz Baumdicker, Dr. Lukas Tatzel, Axel Fehrenbach, Johannes Kippnich
+**Contributors:** Franz Baumdicker, Andrew Kern, Jiseon Min, Nate Pope, Lukas Tatzel, Axel Fehrenbach, Johannes Kippnich
 
 > **Full curriculum:** [docs/CURRICULUM.md](docs/CURRICULUM.md)
 
