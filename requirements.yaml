@@ -7,15 +7,35 @@ channels:
 dependencies:
   - python=3.12
   - pip
+  # tabix / bgzip: the prediction VCF must be bgzipped and tabix-indexed
+  - htslib
   - pip:
+      # --- notebooks 1-4 -------------------------------------------------
       - sbi
+      - torch
       - msprime
-      - matplotlib
       - tskit
+      - numpy
+      - matplotlib
       - jupyter
       - ipykernel
-      # Needed for notebook 5 (popgen-npe Soup-to-Nuts demo).
-      # popgen-npe itself is not on PyPI — clone it as a sibling directory
-      # of this repo (see README.md, "Notebook 5 setup") and install in
-      # editable mode from there.
-      - snakemake
+      # --- notebook 5: popgen-npe Soup-to-Nuts demo ----------------------
+      # The popgen-npe workflow is vendored in this repo under workflow/,
+      # so there is nothing extra to clone. Everything below is imported
+      # by workflow/scripts/*.py at runtime.
+      - snakemake            # runs training_workflow.smk / prediction_workflow.smk
+      - pyyaml               # config + population map parsing
+      - zarr                 # feature / target / posterior-sample store
+      - numcodecs            # zarr compressors (setup_training, setup_prediction)
+      - dinf                 # haplotype matrix extractor behind cnn_extract
+      - scikit-allel         # summary statistics in ts_processors.py
+      - tsinfer              # infers tree sequences from VCF genotypes
+      - bio2zarr             # provides the vcf2zarr CLI
+      - pysam                # reads the ancestral FASTA in setup_prediction.py
+      - lightning            # training / prediction loops
+      - ray                  # parallel data loading in data_handlers.py
+      - pandas               # summary-statistic tables and plots
+      - seaborn              # diagnostic plots
+      - tqdm                 # progress bars in the plotting scripts
+      - stdpopsim            # catalogue models used by other ts_simulators
+      - demes                # demography descriptions used by other ts_simulators
