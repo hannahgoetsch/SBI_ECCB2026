@@ -1,2 +1,16 @@
-notebooks/__pycache__
-notebooks/sbi-logs
+# Python / Jupyter
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Snakemake
+.snakemake/
+
+# Training / prediction logs
+sbi-logs/
+notebooks/sbi-logs/
+
+# Workflow outputs: project_dir in workflow/config/MutRecRate_cnn.yaml points
+# here, so trained checkpoints, Zarr stores and tree sequences land inside
+# notebooks/popgen_npe_demo/<UID>/. Those are generated, not committed.
+notebooks/popgen_npe_demo/*/

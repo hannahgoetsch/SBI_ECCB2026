@@ -32,16 +32,24 @@ See [docs/CURRICULUM.md](docs/CURRICULUM.md) for the detailed session-by-session
 SBI_ECCB2026/
 ├── LICENSE
 ├── README.md
-├── requirements.yaml          # Conda environment specification
+├── requirements.yaml           # Conda environment specification
 ├── docs/
-│   └── CURRICULUM.md          # Detailed tutorial curriculum
+│   └── CURRICULUM.md           # Detailed tutorial curriculum
+├── example_data/
+│   └── MutRecRate/             # VCF + windows + ground truth for notebook 5
+├── workflow/                   # vendored popgen-npe Snakemake pipeline
+│   ├── training_workflow.smk
+│   ├── prediction_workflow.smk
+│   ├── common.smk
+│   ├── config/                 # one YAML per experiment
+│   └── scripts/                # simulators, processors, embedding nets, rules
 └── notebooks/
     ├── 1_data_simulation_msprime.ipynb
     ├── 2_introduction_to_sbi.ipynb
     ├── 3_sbi_in_popgen.ipynb
     ├── 4_playground_complex_scenario.ipynb
     ├── 5_snakemake_workflow.ipynb
-    └── popgen_npe_demo/        # config + pre-trained checkpoint + example VCF for notebook 5
+    └── popgen_npe_demo/        # project_dir for notebook 5 — generated output
 ```
 
 ---
@@ -93,16 +101,29 @@ Apply NPE to jointly infer effective population size ($N_e$) and recombination r
 Design multi-epoch demography with custom `BoxUniform` priors. Compare six demographic scenarios (Medium, Large, Decline, Expansion, Bottleneck, Zigzag) and explore how prior choice shapes inference.
 
 ### Notebook 5 — Snakemake Workflow
-Walk through the [`popgen-npe`](https://github.com/kr-colab/popgen-npe) [Soup-to-Nuts tutorial](https://popgen-npe.readthedocs.io/en/latest/tutorial.html) to infer a **recombination rate landscape** from a VCF. Steps 1–4 (simulator, processor, YAML, training) are read-through; Step 5 runs `prediction_workflow.smk` live against a pre-trained checkpoint shipped in `notebooks/popgen_npe_demo/`; Step 6 plots the resulting per-window posterior. Closes with pointers to cluster scaling and the popgen-npe contributor guide.
+Walk through the [`popgen-npe`](https://github.com/kr-colab/popgen-npe) [Soup-to-Nuts tutorial](https://popgen-npe.readthedocs.io/en/latest/tutorial.html) to infer **recombination-rate and mutation-rate landscapes** from a VCF. Steps 1–3 (simulator, processor, YAML) execute live; Step 4 (training) is explained but pre-run; Step 5 runs `prediction_workflow.smk` live against the example VCF; Step 6 plots the resulting per-window posteriors. Closes with pointers to cluster scaling and the popgen-npe contributor guide.
 
-#### Notebook 5 setup (extra step before the workshop)
+#### Notebook 5 setup (do this before the workshop)
 
-Notebook 5 runs `snakemake --snakefile <popgen-npe>/workflow/prediction_workflow.smk`, so it needs a local clone of popgen-npe. Place it as a sibling of this repository:
+**The popgen-npe workflow is vendored in this repository** under `workflow/` — `training_workflow.smk`, `prediction_workflow.smk`, `common.smk`, `scripts/`, and `config/`. There is no separate repository to clone. The tutorial's `MutRecRate` simulator lives in `workflow/scripts/ts_simulators.py` and its config at `workflow/config/MutRecRate_cnn.yaml`. The prediction inputs are in `example_data/MutRecRate/`.
+
+**1. Refresh the environment.** Notebook 5 needs dependencies the earlier notebooks do not (`snakemake`, `zarr`, `dinf`, `tsinfer`, `bio2zarr`, `pysam`, `lightning`, `ray`, and others). If you built the environment before these were added:
 
 ```bash
-cd ..              # parent of SBI_ECCB2026
-git clone https://github.com/kr-colab/popgen-npe.git
-pip install -e popgen-npe
+conda env update -f requirements.yaml --prune
+conda activate sbi-workshop
 ```
 
-The notebook defaults to `POPGEN_NPE_DIR = Path('../../popgen-npe')` — adjust this variable if you cloned somewhere else. The notebook also expects `notebooks/popgen_npe_demo/config.yaml`, a populated `checkpoint/`, and an `example_vcf/`; see `notebooks/popgen_npe_demo/README.md` for what each slot needs and how to generate the checkpoint.
+The notebook's first code cell checks every package and CLI tool, and reports what is missing.
+
+**2. Train once to produce the checkpoint.** The tutorial does *not* distribute a pre-trained model, so Step 5 has nothing to load until you run the training workflow yourself. From the repository root:
+
+```bash
+snakemake --cores 4 \
+          --configfile workflow/config/MutRecRate_cnn.yaml \
+          --snakefile workflow/training_workflow.smk
+```
+
+Roughly 15 minutes on an A100 at `n_train: 5000`, considerably longer on CPU. Output goes to `notebooks/popgen_npe_demo/MutRecRate-cnn_extract-ExchangeableCNN-42-5000-sep/`, which is where the notebook looks for it — no copying needed. See `notebooks/popgen_npe_demo/README.md` for the full output layout.
+
+Until that checkpoint exists the notebook still runs top to bottom: Steps 1–3 execute for real, and Steps 5 and 6 report exactly which files they are waiting on instead of erroring.
