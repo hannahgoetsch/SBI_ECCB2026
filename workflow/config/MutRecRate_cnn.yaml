@@ -1,0 +1,75 @@
+# --- top level arguments are ALWAYS REQUIRED --- #
+#
+# Config for the popgen-npe "Soup-to-Nuts" tutorial:
+#   https://popgen-npe.readthedocs.io/en/latest/tutorial.html
+#
+# Trains a two-parameter NPE (recombination rate + mutation rate) on
+# constant-rate 500 kb windows, then predicts per-window on a VCF whose
+# rates vary spatially -- i.e. a rate landscape.
+#
+# All paths below are relative to the repository root; run snakemake from
+# there. Outputs land in
+#   notebooks/popgen_npe_demo/MutRecRate-cnn_extract-ExchangeableCNN-42-5000-sep/
+
+project_dir: "notebooks/popgen_npe_demo"
+
+cpu_resources: # optional, used for CPU-only tasks (simulation)
+  runtime: "2h"
+  mem_mb: 16000
+
+gpu_resources: # optional, used for GPU tasks (training)
+  runtime: "4h"
+  mem_mb: 50000
+  gpus: 1
+  slurm_partition: "gpu"
+  slurm_extra: "--gres=gpu:1"
+
+random_seed: 42
+n_chunk: 10 # number of jobs for parallel simulation
+n_train: 5000
+n_val: 500
+n_test: 500
+
+train_embedding_net_separately: True # train embedding network separately from normalizing flow
+use_cache: True # load features into CPU memory
+optimizer: "Adam"
+batch_size: 64
+learning_rate: 0.0005
+max_num_epochs: 200
+stop_after_epochs: 50 # early stopping patience
+clip_max_norm: 5
+packed_sequence: False
+
+# class_name must match the class in workflow/scripts/ts_simulators.py.
+# sequence_length must equal the window size in the prediction BED file.
+simulator:
+  class_name: "MutRecRate"
+  # OPTIONAL CLASS KWARGS:
+  sequence_length: 500000
+  pop_size: 10000
+  samples:
+    pop: 20
+
+processor:
+  class_name: "cnn_extract"
+  # OPTIONAL CLASS KWARGS:
+  n_snps: 1000
+  maf_thresh: 0.0 # keep rare variants: the full SFS is informative about mutation rate
+  phased: False
+  polarised: False # must be False for cnn_extract
+
+# input_rows: number of individuals per population (list, one entry per pop)
+# input_cols: number of SNPs per population (list, one entry per pop)
+embedding_network:
+  class_name: "ExchangeableCNN"
+  # OPTIONAL CLASS KWARGS:
+  output_dim: 64
+  input_rows: [20]
+  input_cols: [1000]
+
+prediction:
+  n_chunk: 5
+  vcf: "example_data/MutRecRate/test.vcf.gz"
+  population_map: "example_data/MutRecRate/popmap.yaml" # subset of samples, with populations
+  windows: "example_data/MutRecRate/windows.bed" # windows to predict over
+  min_snps_per_window: 10 # filter out low-density windows
