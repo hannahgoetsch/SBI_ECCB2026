@@ -11,6 +11,21 @@ sbi-logs/
 notebooks/sbi-logs/
 
 # Workflow outputs: project_dir in workflow/config/MutRecRate_cnn.yaml points
-# here, so trained checkpoints, Zarr stores and tree sequences land inside
-# notebooks/popgen_npe_demo/<UID>/. Those are generated, not committed.
-notebooks/popgen_npe_demo/*/
+# here. We ship the trained checkpoints so a fresh clone can run notebook 5
+# without retraining. Raw tree sequences, training logs, diagnostic plots and
+# the live prediction output directory are regenerated when the workflow runs,
+# so those stay out of git.
+notebooks/popgen_npe_demo/*/trees/
+notebooks/popgen_npe_demo/*/logs/
+notebooks/popgen_npe_demo/*/*.vcf.gz/
+notebooks/popgen_npe_demo/*/plots/
+
+# Of the training zarr we ship only the three summary-statistic arrays that
+# prediction_workflow.smk's plot_tree_stats rule reads via SIM_ZARR
+# (segregating_sites, diversity, Tajimas_D -- 212 KB). The training tensors
+# proper (features/, targets/, *_shape/, the sbi_*/pre_* split indices) are
+# 252 MB and are only consumed by data_handlers.py while *training*, which
+# notebook 5 does not do. Re-running training_workflow.smk regenerates them.
+# zarr_full/ is a local, untracked stash of the complete array.
+notebooks/popgen_npe_demo/*/tensors/zarr_full/
+notebooks/popgen_npe_demo/*/tensors/zarr/.snakemake_timestamp
