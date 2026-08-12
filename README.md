@@ -15,10 +15,10 @@ The tutorial runs for **3 hours 30 minutes** and is structured as follows:
 
 | Segment | Duration |
 |---------|----------|
-| Opening presentation: SBI, population genetics, and our study | 20 min |
-| **Part 1** — Population Genetics (msprime, coalescent, AFS) | 45 min |
+| Opening presentation: SBI, population genetics | 20 min |
+| **Part 1** — Population Genetics (msprime, coalescent, site-frequency spectrum) | 45 min |
 | *Break* | 5 min |
-| **Part 2** — Simulation-Based Inference (NPE, calibration, complex priors) | 85 min |
+| **Part 2** — Simulation-Based Inference (Neural posterior estimation, calibration, complex priors) | 85 min |
 | *Break* | 10 min |
 | **Part 3** — Snakemake workflow demo | 45 min |
 
@@ -34,9 +34,10 @@ SBI_ECCB2026/
 ├── README.md
 ├── requirements.yaml           # Conda environment specification
 ├── docs/
-│   └── CURRICULUM.md           # Detailed tutorial curriculum
+│   ├── CURRICULUM.md           # Detailed tutorial curriculum
+│   └── GLOSSARY.md             # Key terms
 ├── example_data/
-│   └── MutRecRate/             # VCF + windows + ground truth for notebook 5
+│   └── MutRecRate/             # VCF + index + windows + popmap + ground truth
 ├── workflow/                   # vendored popgen-npe Snakemake pipeline
 │   ├── training_workflow.smk
 │   ├── prediction_workflow.smk
@@ -49,14 +50,17 @@ SBI_ECCB2026/
     ├── 3_sbi_in_popgen.ipynb
     ├── 4_playground_complex_scenario.ipynb
     ├── 5_snakemake_workflow.ipynb
-    └── popgen_npe_demo/        # project_dir for notebook 5 — generated output
+    └── popgen_npe_demo/        # project_dir for notebook 5
+        └── MutRecRate-cnn_extract-ExchangeableCNN-42-5000-sep/
+            ├── pretrain_embedding_network   # ready to use
+            └── pretrain_normalizing_flow    # ready to use
 ```
 
 ---
 
 ## Getting started
 
-### Installation (do this before the tutorial — it requires significant memory)
+### Installation (please do this before the tutorial!)
 
 1. **Install Conda** (if not already available): [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
@@ -73,7 +77,7 @@ SBI_ECCB2026/
    ```
    Core dependencies: `msprime`, `tskit`, `torch`, `sbi`, `matplotlib`.
 
-   If you run into Jupyter issues, upgrade it manually:
+   If you run into Jupyter issues, try upgrade it manually:
    ```bash
    pip install --upgrade notebook jupyter_server jupyterlab jupyter_core traitlets
    ```
@@ -97,33 +101,41 @@ Understand the `sbi` package and Neural Posterior Estimation (NPE) with a simple
 ### Notebook 3 — SBI in Population Genetics
 Apply NPE to jointly infer effective population size ($N_e$) and recombination rate from SFS data. Covers the full pipeline — training data generation, model training, posterior predictive checks, and simulation-based calibration (SBC).
 
-### Notebook 4 — Playground: Complex Demographic Scenarios
+### Notebook 4 (OPTIONAL) — Playground: Complex Demographic Scenarios
 Design multi-epoch demography with custom `BoxUniform` priors. Compare six demographic scenarios (Medium, Large, Decline, Expansion, Bottleneck, Zigzag) and explore how prior choice shapes inference.
 
 ### Notebook 5 — Snakemake Workflow
-Walk through the [`popgen-npe`](https://github.com/kr-colab/popgen-npe) [Soup-to-Nuts tutorial](https://popgen-npe.readthedocs.io/en/latest/tutorial.html) to infer **recombination-rate and mutation-rate landscapes** from a VCF. Steps 1–3 (simulator, processor, YAML) execute live; Step 4 (training) is explained but pre-run; Step 5 runs `prediction_workflow.smk` live against the example VCF; Step 6 plots the resulting per-window posteriors. Closes with pointers to cluster scaling and the popgen-npe contributor guide.
+Walk through the [`popgen-npe`](https://github.com/kr-colab/popgen-npe) [Soup-to-Nuts tutorial](https://popgen-npe.readthedocs.io/en/latest/tutorial.html) to infer **recombination-rate and mutation-rate landscapes** from a VCF. 
+
+Steps 1–3 (simulator, processor, YAML) execute live; 
+**Step 4 (training) is read-only — the trained checkpoint ships with this repository, so nothing is trained**; Step 5 runs `prediction_workflow.smk` live against the example VCF; Step 6 loads the per-window posteriors and plots the rate landscapes against the ground truth. Closes with pointers to cluster scaling and the popgen-npe contributor guide.
 
 #### Notebook 5 setup (do this before the workshop)
 
-**The popgen-npe workflow is vendored in this repository** under `workflow/` — `training_workflow.smk`, `prediction_workflow.smk`, `common.smk`, `scripts/`, and `config/`. There is no separate repository to clone. The tutorial's `MutRecRate` simulator lives in `workflow/scripts/ts_simulators.py` and its config at `workflow/config/MutRecRate_cnn.yaml`. The prediction inputs are in `example_data/MutRecRate/`.
+**No training is required.** The trained checkpoints (`pretrain_embedding_network` and `pretrain_normalizing_flow`, ~2 MB) are committed to this repository under `notebooks/popgen_npe_demo/MutRecRate-cnn_extract-ExchangeableCNN-42-5000-sep/`, which is exactly where the workflow expects them. A fresh clone can run the prediction workflow immediately. Step 4 of the notebook is a read-through of what training *would* do, and its cell detects the shipped checkpoint and skips.
 
-**1. Refresh the environment.** Notebook 5 needs dependencies the earlier notebooks do not (`snakemake`, `zarr`, `dinf`, `tsinfer`, `bio2zarr`, `pysam`, `lightning`, `ray`, and others). If you built the environment before these were added:
+**The popgen-npe workflow is already in this repository** under `workflow/`: `training_workflow.smk`, `prediction_workflow.smk`, `common.smk`, `scripts/`, and `config/`. 
+
+There is no separate repository to clone. 
+
+The tutorial's `MutRecRate` simulator lives in `workflow/scripts/ts_simulators.py` and its config at `workflow/config/MutRecRate_cnn.yaml`. The prediction inputs are in `example_data/MutRecRate/`.
+
+**The only setup step is the environment.** Notebook 5 needs dependencies the earlier notebooks do not (`snakemake`, `zarr`, `dinf`, `tsinfer`, `bio2zarr`, `pysam`, `lightning`, `ray`, and others). In case you built the environment incompletely:
 
 ```bash
 conda env update -f requirements.yaml --prune
 conda activate sbi-workshop
 ```
 
-The notebook's first code cell checks every package and CLI tool, and reports what is missing.
+The notebook's first code cell checks every package and CLI tool (`snakemake`, `vcf2zarr`, `tabix`) and reports what is missing.
 
-**2. Train once to produce the checkpoint.** The tutorial does *not* distribute a pre-trained model, so Step 5 has nothing to load until you run the training workflow yourself. From the repository root:
+With that in place the notebook runs top to bottom:
 
-```bash
-snakemake --cores 4 \
-          --configfile workflow/config/MutRecRate_cnn.yaml \
-          --snakefile workflow/training_workflow.smk
-```
+| Step | What happens | Cost |
+|------|--------------|------|
+| 1–3 | Simulator, processor, and config are inspected and sanity-checked live | seconds |
+| 4 | Training is explained only; the cell finds the shipped checkpoint and skips | none |
+| 5 | `prediction_workflow.smk` runs live on `example_data/MutRecRate/test.vcf.gz` — 15 rules: VCF→Zarr, `tsinfer`, `cnn_extract`, posterior sampling, diagnostics | ~1 min on a laptop at `--cores 2` |
+| 6 | Loads the `(30 windows, 2 parameters, 1000 draws)` posterior array and plots the rate landscapes | seconds |
 
-Roughly 15 minutes on an A100 at `n_train: 5000`, considerably longer on CPU. Output goes to `notebooks/popgen_npe_demo/MutRecRate-cnn_extract-ExchangeableCNN-42-5000-sep/`, which is where the notebook looks for it — no copying needed. See `notebooks/popgen_npe_demo/README.md` for the full output layout.
-
-Until that checkpoint exists the notebook still runs top to bottom: Steps 1–3 execute for real, and Steps 5 and 6 report exactly which files they are waiting on instead of erroring.
+Retraining is entirely optional, check [notebooks/popgen_npe_demo/README.md](notebooks/popgen_npe_demo/README.md) for the command, the output layout, and the one gotcha (delete the pruned `tensors/zarr/` first).

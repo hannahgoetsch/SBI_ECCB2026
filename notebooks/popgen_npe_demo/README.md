@@ -8,8 +8,8 @@ project_dir: "notebooks/popgen_npe_demo"
 ```
 
 Almost everything in this folder is **generated** and gitignored. The exceptions are
-committed on purpose so that a fresh clone can run notebook 5 without retraining: the two
-`pretrain_*` checkpoints, and a pruned `tensors/zarr/` (see below).
+committed on purpose so that a fresh clone can run notebook 5 **without training anything**:
+the `pretrain_*` checkpoints, a pruned `tensors/zarr/`, and the step 6 figure `rate_landscape.png`, kept as a reference for what a correct run looks like.
 
 ## What the workflows write here
 
@@ -19,57 +19,53 @@ config that is:
 
 ```
 popgen_npe_demo/
+├── README.md                                         [committed]
+├── rate_landscape.png               # Step 6 figure  [committed]
 └── MutRecRate-cnn_extract-ExchangeableCNN-42-5000-sep/
-    ├── pretrain_embedding_network   # trained ExchangeableCNN      ← Step 4  [committed]
-    ├── pretrain_normalizing_flow    # trained NPE                  ← Step 4  [committed]
-    ├── tensors/zarr/                # training features + targets  [pruned, committed]
-    ├── trees/                       # simulated tree sequences
-    ├── logs/                        # TensorBoard training logs
-    ├── plots/                       # training diagnostics
+    ├── pretrain_embedding_network       # trained ExchangeableCNN  ← Step 4  [committed]
+    ├── pretrain_embedding_network.ckpt  # Lightning best-epoch ckpt         [committed]
+    ├── pretrain_normalizing_flow        # trained NPE              ← Step 4  [committed]
+    ├── pretrain_normalizing_flow.ckpt   # Lightning best-epoch ckpt         [committed]
+    ├── tensors/zarr/                    # training features + targets [pruned, committed]
+    ├── trees/                           # simulated tree sequences
+    ├── logs/                            # TensorBoard training logs
+    ├── plots/                           # training diagnostics
     │   ├── posterior_calibration.png
     │   ├── posterior_expectation.png
     │   └── ...
-    └── test.vcf.gz/                 #                              ← Step 5
-        ├── vcz/                     # Zarr-encoded VCF
-        ├── trees/                   # tsinfer output, one per window
-        ├── tensors/zarr/predictions # (n_windows, n_parameters, 1000)
+    └── test.vcf.gz/                     #                          ← Step 5
+        ├── vcz/                         # Zarr-encoded VCF
+        ├── trees/                       # tsinfer output, one per window
+        ├── tensors/zarr/predictions     # (n_windows, n_parameters, 1000)
         └── plots/
             ├── posteriors-across-windows.png
             └── tree_stats_hist.png
 ```
 
+Using the model needs only two of those files: prediction loads `pretrain_embedding_network`
+and `pretrain_normalizing_flow`. The `.ckpt` files are Lightning's best-epoch snapshots, from
+which the training scripts derive those two; they are kept for provenance. Everything under
+`test.vcf.gz/` is written by Step 5 of the notebook and is gitignored.
+
 Changing `random_seed` or `n_train` produces a new directory rather than overwriting
 the old one.
 
-## What is committed, and why
+### Re-training *(optional — not needed for the workshop)*
 
-The upstream tutorial does not distribute a pre-trained checkpoint, so this repository
-ships its own. `pretrain_embedding_network` and `pretrain_normalizing_flow` (~2 MB
-together) are committed, which means **you do not need to train before the workshop** —
-notebook 5 runs the prediction workflow straight from a fresh clone.
-
-`tensors/zarr/` is committed in **pruned** form (212 KB, 7 files). The full array is
-252 MB across 4,624 files, and nearly all of that is `features/`. The prediction workflow
-only ever reads three arrays from it — `segregating_sites`, `diversity` and `Tajimas_D`,
-via the `SIM_ZARR` param of the `plot_tree_stats` rule — so only those are tracked. The
-training tensors proper (`features/`, `targets/`, `*_shape/`, and the `sbi_*`/`pre_*`
-split indices) are read by `data_handlers.py` during *training* only, and are regenerated
-whenever the training workflow runs.
-
-### Re-training
-
-To retrain from scratch, run from the repository root:
+Only relevant if you change the simulator, processor, config, or `n_train`. To retrain
+from scratch, run from the repository root:
 
 ```bash
-snakemake --cores 4 \
-          --configfile workflow/config/MutRecRate_cnn.yaml \
-          --snakefile workflow/training_workflow.smk
+snakemake --cores 4 --configfile workflow/config/MutRecRate_cnn.yaml --snakefile workflow/training_workflow.smk
 ```
 
 Roughly 15 minutes on an A100 at `n_train: 5000`, considerably longer on CPU. Simulation
 is the bottleneck, so raise `n_chunk` if you have cores to spare. Because `project_dir`
-already points here, nothing needs copying afterwards — Step 5 of the notebook picks the
-checkpoint up automatically.
+already points here, nothing needs copying afterwards. The step 5 of the notebook picks the
+checkpoint up automatically. 
+
+> Note that this **overwrites the committed checkpoints** in place, since the config resolves to the same directory; bump `random_seed` or `n_train`
+if you want to keep both.
 
 > **Delete `tensors/zarr/` first.** `setup_training` declares it as a `directory()`
 > output, so Snakemake treats the committed pruned copy as an already-satisfied output

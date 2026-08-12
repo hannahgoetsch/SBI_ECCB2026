@@ -57,7 +57,6 @@ A list of abbreviations and terms used throughout this workshop, grouped by topi
 
 | Term / Abbreviation | Description |
 |---------------------|-------------|
-| AFS (Allele Frequency Spectrum) | Distribution of allele frequencies across sites. |
 | Ancestral Allele | The original allele at a locus, before a mutation occurred. |
 | Coalescent | A model describing how sampled lineages merge (coalesce) back in time to common ancestors. |
 | Derived Allele | The new allele at a locus that arose via mutation from the ancestral allele. |
@@ -69,7 +68,7 @@ A list of abbreviations and terms used throughout this workshop, grouped by topi
 | N_e (Effective Population Size) | Size of an idealized population that drifts at the same rate as the observed one. |
 | Recombination | The exchange of genetic material between chromosomes, breaking up linkage. |
 | Segregating Site | A position in the genome that is polymorphic (varies) within a sample. |
-| SFS (Site-Frequency Spectrum) | see AFS |
+| SFS (Site-Frequency Spectrum) | Distribution of allele counts across segregating sites. |
 | SNP (Single Nucleotide Polymorphism) | A variation at a single position in the DNA sequence. |
 | Tree Sequence | A compact data structure encoding the genealogies along a genome, including recombination. |
 | VCF (Variant Call Format) | Standard text format for storing genetic sequence variations. |

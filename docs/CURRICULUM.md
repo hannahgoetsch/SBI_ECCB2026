@@ -139,12 +139,12 @@ bioRxiv 2025.12.01.691638; doi: https://doi.org/10.64898/2025.12.01.691638](http
 ### 3.2 Pipeline architecture (10 min)
 - Repository structure of [`popgen-npe`](https://github.com/kr-colab/popgen-npe): `workflow/training_workflow.smk`, `workflow/prediction_workflow.smk`, `workflow/config/`
 - The simulator → processor → embedding network → normalising flow pipeline
-- One YAML drives both training and prediction (see `popgen_npe_demo/config.yaml`)
+- One YAML drives both training and prediction (see `workflow/config/MutRecRate_cnn.yaml`)
 
 ### 3.3 Live demo: running the pipeline (40 min)
 - Walk through the Soup-to-Nuts tutorial's six steps inside `5_snakemake_workflow.ipynb`
 - Steps 1–3 (simulator, processor, YAML): read the config that produced the shipped checkpoint
-- Step 4 (training): explain, **do not** re-run live — checkpoint is shipped at `notebooks/popgen_npe_demo/checkpoint/`
+- Step 4 (training): explain, **do not** re-run live — the checkpoint ships with the repository at `notebooks/popgen_npe_demo/MutRecRate-cnn_extract-ExchangeableCNN-42-5000-sep/`, so no training is required before or during the session
 - Step 5 (prediction): live run of `snakemake --snakefile workflow/prediction_workflow.smk` against the bundled example VCF
 - Step 6 (interpret): load per-window posteriors, plot the rate landscape
 

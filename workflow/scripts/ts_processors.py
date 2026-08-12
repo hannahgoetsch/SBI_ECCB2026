@@ -305,7 +305,7 @@ class ReLERNN_processor(BaseProcessor):
 
 class tskit_windowed_sfs_plus_ld(BaseProcessor):
     """
-    Summary statistics processor that returns a vector of the mean r2 across distances and the mean afs
+    Summary statistics processor that returns a vector of the mean r2 across distances and the mean sfs
     where the mean is taken over windows.
 
     Mean currently only for the single population case.
@@ -420,7 +420,7 @@ class tskit_windowed_sfs_plus_ld(BaseProcessor):
         # iterate over windows such that the last window is the remainder
         # start at 0, end at sequence_length, step by 1_000_000
         ld_stats = []
-        afs_stats = []
+        sfs_stats = []
         for i in range(len(windows)):
             if i == len(windows) - 1:
                 window_end = sequence_length
@@ -438,15 +438,15 @@ class tskit_windowed_sfs_plus_ld(BaseProcessor):
                 )
             )
 
-            # get the AFS for each window
-            afs = ts_win.allele_frequency_spectrum(
+            # get the SFS for each window
+            sfs = ts_win.allele_frequency_spectrum(
                 mode="site",
                 polarised=self.polarised,
                 span_normalise=self.span_normalise,
             )
-            # normalize the AFS
-            # afs = afs / np.sum(afs)
-            afs_stats.append(afs)
+            # normalize the SFS
+            # sfs = sfs / np.sum(sfs)
+            sfs_stats.append(sfs)
 
         # calculate the mean r2 for each window at each distance
         mean_r2_values = (
@@ -456,7 +456,7 @@ class tskit_windowed_sfs_plus_ld(BaseProcessor):
             .fillna(0)  # Replace any remaining NaNs with 0
         )
 
-        # calculate the mean afs for each window
-        mean_afs_values = np.stack(afs_stats).mean(axis=0)[1:-1]
-        sum_stats = np.concatenate((mean_r2_values, mean_afs_values))
+        # calculate the mean sfs for each window
+        mean_sfs_values = np.stack(sfs_stats).mean(axis=0)[1:-1]
+        sum_stats = np.concatenate((mean_r2_values, mean_sfs_values))
         return sum_stats
