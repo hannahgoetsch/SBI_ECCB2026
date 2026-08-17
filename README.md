@@ -11,18 +11,31 @@ A 3.5-hour hands-on tutorial on **simulation-based inference (SBI)** in populati
 
 ## Tutorial outline
 
-The tutorial runs for **3 hours 30 minutes** and is structured as follows:
+The tutorial runs for **3 hours 30 minutes** (09:00–12:30), followed by open-ended discussions, and is structured as follows:
 
-| Segment | Duration |
-|---------|----------|
-| Opening presentation: SBI, population genetics | 20 min |
-| **Part 1** — Population Genetics (msprime, coalescent, site-frequency spectrum) | 45 min |
-| *Break* | 5 min |
-| **Part 2** — Simulation-Based Inference (Neural posterior estimation, calibration, complex priors) | 85 min |
-| *Break* | 10 min |
-| **Part 3** — Snakemake workflow demo | 45 min |
+| Time | Segment | Duration |
+|------|---------|----------|
+| 09:00 | Opening presentation: SBI, population genetics | 15 min |
+| 09:15 | **Part 1** — Population Genetics (msprime, coalescent, site-frequency spectrum) | 40 min |
+| 09:55 | **Part 2** — Simulation-Based Inference (Neural posterior estimation, calibration, complex priors) | 35 min |
+| 10:30 | *Break* | 15 min |
+| 10:45 | **Part 2 continued** — Simulation-Based Inference | 35 min |
+| 11:20 | **Part 3** — Snakemake workflow demo | 70 min |
+| 12:30 | *Discussions* | — |
 
 See [docs/CURRICULUM.md](docs/CURRICULUM.md) for the detailed session-by-session breakdown.
+
+---
+
+## Learning outcomes
+
+By the end of the tutorial, we will be able to:
+
+1. simulate population-genetic data with `msprime` and extract summary statistics (SFS) with `tskit`;
+2. explain the idea behind neural posterior estimation: a conditional normalizing flow trained on simulated $(\theta, x)$ pairs, and how it relates to ABC;
+3. set up priors, simulators, and training loops with the `sbi` package;
+4. validate posteriors with loss curves, posterior predictive checks, and simulation-based calibration, and recognize the signatures of common failure modes (tiny simulation budgets, misspecified priors, uninformative summary statistics);
+5. run and adapt a research-grade Snakemake SBI pipeline ([`popgen-npe`](https://github.com/kr-colab/popgen-npe)) to infer rate landscapes from a VCF.
 
 ---
 
@@ -38,7 +51,7 @@ SBI_ECCB2026/
 │   └── GLOSSARY.md             # Key terms
 ├── example_data/
 │   └── MutRecRate/             # VCF + index + windows + popmap + ground truth
-├── workflow/                   # vendored popgen-npe Snakemake pipeline
+├── workflow/                   # popgen-npe Snakemake pipeline
 │   ├── training_workflow.smk
 │   ├── prediction_workflow.smk
 │   ├── common.smk
@@ -99,10 +112,12 @@ Simulate genetic data under the coalescent: constant-size populations, tree sequ
 Understand the `sbi` package and Neural Posterior Estimation (NPE) with a simple linear Gaussian example: define a `Prior`, a `Simulator`, train an `NPE` estimator, and run posterior predictive checks.
 
 ### Notebook 3 — SBI in Population Genetics
-Apply NPE to jointly infer effective population size ($N_e$) and recombination rate from SFS data. Covers the full pipeline — training data generation, model training, posterior predictive checks, and simulation-based calibration (SBC).
+Apply NPE to jointly infer two epoch-specific effective population sizes ($N_{e,1}$, $N_{e,2}$) from the folded SFS, using a log-uniform prior. 
+
+Mutation and recombination rates are held fixed in the simulator — NPE infers exactly the parameters that are randomized during simulation, no more.
 
 ### Notebook 4 (OPTIONAL) — Playground: Complex Demographic Scenarios
-Design multi-epoch demography with custom `BoxUniform` priors. Compare six demographic scenarios (Medium, Large, Decline, Expansion, Bottleneck, Zigzag) and explore how prior choice shapes inference.
+Design multi-epoch demography with custom `BoxUniform` priors. Compare six demographic scenarios (Medium, Large, Decline, Expansion, Bottleneck, Zigzag), separate demographic signal from coalescent noise, and explore how prior choice shapes the simulated data, with a take-home exercise connecting each choice to its expected effect on the NPE posterior.
 
 ### Notebook 5 — Snakemake Workflow
 Walk through the [`popgen-npe`](https://github.com/kr-colab/popgen-npe) [Soup-to-Nuts tutorial](https://popgen-npe.readthedocs.io/en/latest/tutorial.html) to infer **recombination-rate and mutation-rate landscapes** from a VCF. 

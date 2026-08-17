@@ -10,14 +10,17 @@ A list of abbreviations and terms used throughout this workshop, grouped by topi
 | Bayesian Inference | The process of updating beliefs about parameters given observed data via Bayes' theorem. |
 | Bayesian Method | An approach to statistics based on probability distributions over parameters. |
 | Checkpoint | A saved snapshot of a model's state during training, enabling resumption or evaluation. |
+| Credible Interval | An interval containing a given fraction (e.g. 90%) of the posterior probability mass. |
 | Diagnostics | Checks and metrics used to assess model correctness and performance. |
 | Embedding Network | A neural network that compresses raw/high-dimensional data into informative summary features. |
 | Features | Input variables/characteristics used by a model (may be raw data or summary statistics). |
 | Likelihood | The probability of observing the data given specific parameter values. |
 | Linear-Gaussian Model | A model with linear relationships and Gaussian noise; often used as a test/benchmark case. |
+| Log-uniform Prior | A prior that is uniform on the logarithm of a parameter; standard for scale parameters such as $N_e$ or mutation/recombination rates. |
 | MCMC (Markov Chain Monte Carlo) | A class of algorithms for sampling from probability distributions, often used in Bayesian inference. |
 | Neural Density Estimator | A neural network trained to approximate a probability distribution. |
 | NLE (Neural Likelihood Estimation) | An SBI method that uses neural networks to approximate the likelihood. |
+| Normalizing Flow | A neural density estimator that transforms a simple base distribution (e.g. a Gaussian) through a chain of invertible, differentiable transformations; conditioned on data, it represents the posterior in NPE. |
 | NPE (Neural Posterior Estimation) | An SBI method that uses neural networks to directly approximate the posterior. |
 | NRE (Neural Ratio Estimation) | An SBI method that estimates likelihood-to-evidence ratios using neural networks. |
 | Posterior | Updated distribution of parameters *after* observing data. |

@@ -1,9 +1,9 @@
 # ECCB Tutorial Curriculum
 ## Neural posterior estimation for population genetics
 
-**Duration:** ~3 hours 25 minutes (+ open-ended Discussions)  
+**Duration:** 3 hours 30 minutes, 09:00–12:30, including a 15-minute break (+ open-ended Discussions)  
 **Hosts:** Yuxin Ning, Hannah Götsch  
-**Contributors:** Franz Baumdicker, Andrew Kern, Lukas Tatzel, Axel Fehrenbach, Johannes Kippnich
+**Contributors:** Franz Baumdicker, Andrew Kern, Jiseon Min, Nate Pope, Lukas Tatzel, Axel Fehrenbach, Johannes Kippnich
 
 ---
 
@@ -17,7 +17,7 @@
 | 10:30 | *Break* | 15 min |
 | 10:45 | Part 2 continued: Simulation-Based Inference | 35 min |
 | 11:20 | Part 3: Snakemake Workflow | 70 min |
-| 12:35 | Discussions | — |
+| 12:30 | Discussions | — |
 
 ---
 
@@ -62,11 +62,7 @@ bioRxiv 2025.12.01.691638; doi: https://doi.org/10.64898/2025.12.01.691638](http
 
 ---
 
-## *Break (5 min)*
-
----
-
-## Part 2: Simulation-Based Inference (70 min)
+## Part 2: Simulation-Based Inference (70 min, in two 35-min blocks either side of the break)
 
 **Showcase in Notebooks: `2_introduction_to_sbi.ipynb`, `3_sbi_in_popgen.ipynb`, `4_playground_complex_scenario.ipynb`**
 
@@ -89,24 +85,34 @@ bioRxiv 2025.12.01.691638; doi: https://doi.org/10.64898/2025.12.01.691638](http
 
 ---
 
-### 2b. SBI in Population Genetics (30 min) — `3_sbi_in_popgen.ipynb`
+### 2b. SBI in Population Genetics (30 min core, split by the break; 2b.4 optional) — `3_sbi_in_popgen.ipynb`
 
 #### 2b.1 Applying NPE to popgen (10 min)
 - The full pipeline: msprime simulator → SFS summary statistic → prior → NPE
-- Jointly inferring $N_e$ and the recombination rate
+- Jointly inferring two epoch-specific $N_e$ values ($N_{e,1}$, $N_{e,2}$) with a log-uniform prior; recombination and mutation rates stay fixed in the simulator. 
 
-#### 2b.2 Training and evaluation (15 min)
+> NPE infers exactly the parameters that are randomized during simulation.
+
+#### 2b.2 Q&A / buffer (5 min)
+
+---
+
+## *Break (15 min)* — 10:30–10:45
+
+---
+
+#### 2b.3 Training and evaluation (15 min)
 - Generating $(\theta, x)$ training pairs
 - Training the density estimator and monitoring convergence
 - Posterior predictive checks on held-out test data
 
-#### 2b.3 Simulation-based calibration (SBC) (5 min) — *optional*
+#### 2b.4 Simulation-based calibration (SBC) (5 min) — *optional*
 - Why calibration matters for scientific credibility
 - Running SBC and interpreting rank histograms
 
 ---
 
-### 2c. Playground — Complex Demographic Scenarios (20 min) — `4_playground_complex_scenario.ipynb`
+### 2c. Playground — Complex Demographic Scenarios (20 min) — *optional* — `4_playground_complex_scenario.ipynb`
 
 #### 2c.1 Multi-epoch demography (8 min)
 - Designing a `BoxUniform` prior over epoch-specific $N_e$ values and recombination rate
@@ -118,11 +124,7 @@ bioRxiv 2025.12.01.691638; doi: https://doi.org/10.64898/2025.12.01.691638](http
 
 #### 2c.3 Why your prior matters (5 min)
 - Coverage, identifiability, and pathological priors
-- Open exploration: participants modify priors and observe effects
-
----
-
-## *Break (10 min)*
+- Open exploration: feel free to modify priors and observe the effects on the simulated summaries
 
 ---
 
